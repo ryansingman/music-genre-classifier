@@ -22,10 +22,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     with open(args.classifier_conf_path, "r") as classifier_conf_file:
-        classifier_conf = yaml.load(classifier_conf_file)
+        classifier_conf = yaml.load(classifier_conf_file, Loader=yaml.Loader)
 
     # create dataset 
-    full_ds: tf.data.Dataset = dataset.create_gtzan_dataset(classifier_conf.features)
+    full_ds: tf.data.Dataset = dataset.create_gtzan_dataset(
+        classifier_conf.dataset.url,
+        classifier_conf.dataset.data_dir,
+        classifier_conf.dataset.features,
+    )
 
     # create train, test, validation split
     train_ds, test_ds, validate_ds = dataset.split_dataset(full_ds)
