@@ -75,9 +75,9 @@ def create_gtzan_dataset(
     tf.data.Dataset
         tensorflow dataset composed of the requested features
     """
-    # check if dataset downloaded
+    # check if dataset is not yet downloaded
     if not _get_csv_file_path(data_dir, three_sec_songs).exists():
-        # if it doesn't already exist, download dataset
+        # download dataset
         _download_dataset(gtzan_url, data_dir)
 
     # load csv into dataset and return

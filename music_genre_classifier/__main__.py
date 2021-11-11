@@ -25,11 +25,7 @@ if __name__ == "__main__":
         classifier_conf = yaml.load(classifier_conf_file, Loader=yaml.Loader)
 
     # create dataset 
-    full_ds: tf.data.Dataset = dataset.create_gtzan_dataset(
-        classifier_conf.dataset.url,
-        classifier_conf.dataset.data_dir,
-        classifier_conf.dataset.features,
-    )
+    full_ds: tf.data.Dataset = dataset.create_gtzan_dataset(**classifier_conf["dataset"])
 
     # create train, test, validation split
     train_ds, test_ds, validate_ds = dataset.split_dataset(full_ds)
