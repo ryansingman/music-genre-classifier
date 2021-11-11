@@ -1,7 +1,4 @@
-import pytest
 import yaml
-from yaml.loader import Loader
-
 
 from music_genre_classifier import dataset
 
@@ -9,7 +6,7 @@ from music_genre_classifier import dataset
 def test_create_gtzan_dataset():
     """Tests that create gtzan dataset function returns a valid dataset."""
     # load default dataset configuration from yaml
-    with open("configs/default.yaml", "r") as conf:
+    with open("configs/default.yaml") as conf:
         dataset_conf = yaml.load(conf, Loader=yaml.Loader)["dataset"]
 
     # run dataset creator with config

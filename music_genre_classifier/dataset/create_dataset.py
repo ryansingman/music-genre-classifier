@@ -53,7 +53,7 @@ def create_gtzan_dataset(
     data_dir: str,
     features: List[str],
     batch_size: int,
-    three_sec_songs: bool = False
+    three_sec_songs: bool = False,
 ) -> tf.data.Dataset:
     """Creates GTZAN tensorflow dataset.
 

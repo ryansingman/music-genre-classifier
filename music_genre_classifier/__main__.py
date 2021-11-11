@@ -3,9 +3,9 @@ from typing import List
 import tensorflow as tf
 import yaml
 
-import dataset
-import evaluation
-import models
+from music_genre_classifier import dataset
+from music_genre_classifier import evaluation
+from music_genre_classifier import models
 
 
 if __name__ == "__main__":
@@ -17,14 +17,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--display_results",
         help="if should display results of training",
-        action="store_true"
+        action="store_true",
     )
 
     args = parser.parse_args()
-    with open(args.classifier_conf_path, "r") as classifier_conf_file:
+    with open(args.classifier_conf_path) as classifier_conf_file:
         classifier_conf = yaml.load(classifier_conf_file, Loader=yaml.Loader)
 
-    # create dataset 
+    # create dataset
     full_ds: tf.data.Dataset = dataset.create_gtzan_dataset(**classifier_conf["dataset"])
 
     # create train, test, validation split
