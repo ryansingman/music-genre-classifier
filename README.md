@@ -18,6 +18,9 @@ pre-commit install
 
 This will run checks on your code every time you commit.
 
+### Kaggle API
+Follow the API credential steps [here]{https://github.com/Kaggle/kaggle-api#api-credentials} to download the dataset from Kaggle.
+
 ## Test Instructions
 You can run the test suite with the following command:
 

@@ -1,0 +1,13 @@
+dataset:
+  gtzan_url: andradaolteanu/gtzan-dataset-music-genre-classification
+  data_dir: "data"
+  batch_size: 2
+  features:
+    - chroma_stft_mean
+    - chroma_stft_var
+    - rms_mean
+    - rms_var
+    - spectral_centroid_mean
+    - spectral_centroid_var
+    - spectral_bandwidth_mean
+    - spectral_bandwidth_var
