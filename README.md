@@ -21,9 +21,14 @@ This will run checks on your code every time you commit.
 ### Kaggle API
 Follow the API credential steps [here]{https://github.com/Kaggle/kaggle-api#api-credentials} to download the dataset from Kaggle.
 
-## Test Instructions
-You can run the test suite with the following command:
+## Training Instructions
+To train a model, run the following command:
 
 ```
-tox
+python -m music_genre_classifier <path_to_config> --display_results
+```
+
+For example, to train only the KNN model, you would run:
+```
+python -m music_genre_classifier configs/knn_only.yaml --display_results
 ```
