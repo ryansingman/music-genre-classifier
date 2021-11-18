@@ -1,5 +1,6 @@
-# Data directory
+# Data and models directories
 data/
+trained_models/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

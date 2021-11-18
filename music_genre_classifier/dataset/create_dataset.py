@@ -3,7 +3,8 @@ import shutil
 from typing import List
 
 import kaggle
-import tensorflow as tf
+import numpy as np
+import pandas as pd
 
 
 def _get_csv_file_path(data_dir: str, three_sec_song: bool) -> pathlib.Path:
@@ -52,10 +53,9 @@ def create_gtzan_dataset(
     gtzan_url: str,
     data_dir: str,
     features: List[str],
-    batch_size: int,
-    three_sec_songs: bool = False,
-) -> tf.data.Dataset:
-    """Creates GTZAN tensorflow dataset.
+    three_sec_songs: bool = True,
+) -> np.ndarray:
+    """Creates GTZAN dataset.
 
     Parameters
     ----------
@@ -72,18 +72,22 @@ def create_gtzan_dataset(
 
     Returns
     -------
-    tf.data.Dataset
-        tensorflow dataset composed of the requested features
+    np.ndarray
+        numpy array composed of the requested features, labels
     """
     # check if dataset is not yet downloaded
     if not _get_csv_file_path(data_dir, three_sec_songs).exists():
         # download dataset
         _download_dataset(gtzan_url, data_dir)
 
-    # load csv into dataset and return
-    return tf.data.experimental.make_csv_dataset(
+    # load csv into numpy array
+    dataset_arr = pd.read_csv(
         str(_get_csv_file_path(data_dir, three_sec_songs)),
-        batch_size=batch_size,
-        select_columns=features + ["label"],
-        label_name="label",
-    )
+        names=features + ["label"],
+    )[1:].to_numpy()
+
+    # convert categorical labels to ints
+    _, dataset_arr[:, -1] = np.unique(dataset_arr[:, -1], return_inverse=True)
+
+    # return np dataset
+    return dataset_arr.astype(np.float64)

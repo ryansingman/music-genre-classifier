@@ -1,10 +1,10 @@
 from typing import List
+from typing import Tuple
 
-import tensorflow as tf
+import numpy as np
 import yaml
 
 from music_genre_classifier import dataset
-from music_genre_classifier import evaluation
 from music_genre_classifier import models
 
 
@@ -25,34 +25,31 @@ if __name__ == "__main__":
         classifier_conf = yaml.load(classifier_conf_file, Loader=yaml.Loader)
 
     # create dataset
-    full_ds: tf.data.Dataset = dataset.create_gtzan_dataset(**classifier_conf["dataset"])
+    full_ds: np.ndarray = dataset.create_gtzan_dataset(**classifier_conf["dataset"])
 
     # create train, test, validation split
-    train_ds, test_ds, validate_ds = dataset.split_dataset(full_ds)
+    train_ds, test_ds = dataset.split_dataset(full_ds)
 
     # create models from config
-    model_trainables: List[models.Model] = [
-        models.Model.from_config(model_conf) for model_conf in classifier_conf.models
+    model_trainables: List[models.ModelTrainable] = [
+        models.build_from_config(model_conf, train_ds, test_ds)
+        for model_conf in classifier_conf["models"]
     ]
 
     # find hyperparameters (TODO: parallelize this later)
     for model in model_trainables:
-        model.tune(train_ds, validate_ds)
+        model.tune()
 
     # train models (TODO: parallelize this later)
     for model in model_trainables:
-        model.train(train_ds)
+        model.train()
 
     # evaluate models (TODO: parallelize this later)
-    results: List[evaluation.ModelResult] = []
+    results: List[Tuple[float, float]] = []
     for model in model_trainables:
-        results.append(evaluation.eval_model(model, test_ds))
-
-    # save model weights
-    for model in model_trainables:
-        model.save()
+        results.append(model.test())
 
     # display results
     if args.display_results:
-        for result in results:
-            print(result)
+        for model, result in zip(model_trainables, results):
+            print(str(model), model._best_hyperparams.values, result)   # type: ignore

@@ -3,21 +3,24 @@ from typing import Dict
 from typing import Optional
 from typing import Tuple
 
+import keras
 import keras_tuner as kt
-import tensorflow as tf
+import numpy as np
+
+from music_genre_classifier import dataset
 
 
 class ModelTrainable(abc.ABC):
     """Trainable model base class, defines interface for trainable models."""
 
-    def __init__(self, train_ds: tf.data.Dataset, test_ds: tf.data.Dataset):
+    def __init__(self, train_ds: np.ndarray, test_ds: np.ndarray):
         """Initializes trainable with train dataset.
 
         Parameters
         ----------
-        train_ds : tf.data.Dataset
+        train_ds : np.ndarray
             dataset to train model with
-        test_ds : tf.data.Dataset
+        test_ds : np.ndarray
             dataset to test model with
         """
         self._train_ds = train_ds
@@ -25,13 +28,13 @@ class ModelTrainable(abc.ABC):
 
         # trainable status flags
         self._best_hyperparams: Optional[Dict] = None
-        self._model: Optional[tf.keras.Model] = None
+        self._model: Optional[keras.Model] = None
 
     def tune(self):
         """Performs hyperparameter tuning for model."""
         self._best_hyperparams = self._tune()
 
-    def train(self, hyperparams: Optional[Dict]):
+    def train(self, hyperparams: Optional[Dict] = None):
         """Trains model using optimal (or provided) hyperparameters."""
         if hyperparams is None:
             if self._best_hyperparams is None:
@@ -51,7 +54,27 @@ class ModelTrainable(abc.ABC):
         Tuple[float, float]
             tuple of model loss and accuracy
         """
-        return self._trained_model.evaluate(self._test_ds)
+        return self._trained_model.evaluate(*dataset.split_features_and_labels(self._test_ds))
+
+    @staticmethod
+    def _train_val_split(
+        full_ds: np.ndarray, val_split: float = 0.2,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Splits dataset into training and validation datasets.
+
+        Parameters
+        ----------
+        full_ds : np.ndarray
+            dataset to split
+        val_split : float, optional
+            ratio of validation to full dataset, by default 0.2
+
+        Returns
+        -------
+        Tuple[np.ndarray, np.ndarray]
+            train, validation datasets
+        """
+        return dataset.split_dataset(full_ds, val_split)
 
     @abc.abstractmethod
     def _tune(self) -> Dict:
@@ -65,7 +88,7 @@ class ModelTrainable(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def _train(self, hyperparams: Dict) -> tf.keras.Model:
+    def _train(self, hyperparams: Dict) -> keras.Model:
         """Trains model on hyperparameters and returns trained model.
 
         Parameters
@@ -75,13 +98,13 @@ class ModelTrainable(abc.ABC):
 
         Returns
         -------
-        tf.keras.Model
+        keras.Model
             trained model
         """
         ...
 
-    @abc.abstractstaticmethod
-    def _model_builder(hp: kt.HyperParameters) -> tf.keras.Model:
+    @abc.abstractmethod
+    def _model_builder(self, hp: kt.HyperParameters) -> keras.Model:
         """Model builder function, builds model to tune and train.
 
         Parameters
@@ -91,7 +114,7 @@ class ModelTrainable(abc.ABC):
 
         Returns
         -------
-        tf.keras.Model
+        keras.Model
             keras model to tune and train
         """
         ...
