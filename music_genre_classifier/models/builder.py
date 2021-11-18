@@ -3,6 +3,7 @@ from typing import Dict
 import numpy as np
 
 from .base import ModelTrainable
+from .knn import KNN
 from .neural_net import NeuralNet
 
 
@@ -26,7 +27,10 @@ def build_from_config(
         instantiated model trainable
     """
     model_name = model_params.pop("model")
+
     if model_name == "neural_net":
         return NeuralNet(train_ds, test_ds, **model_params)
+    elif model_name == "knn":
+        return KNN(train_ds, test_ds, **model_params)
     else:
         raise ValueError(f"Invalid model name {model_name}.")

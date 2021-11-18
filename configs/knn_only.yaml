@@ -63,7 +63,4 @@ dataset:
 
 models:
   -
-    model: neural_net
-    train_epochs: 50
-  -
-    model: knn
+    model: knn 
