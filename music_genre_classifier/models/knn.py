@@ -35,19 +35,11 @@ class KNN(ModelTrainable):
         np.array
             Normalized array of features and labels
         """
-<<<<<<< HEAD
-        labels = array[:,-1]
-        scaled_ds = scale(array[:,:-1])
-        scaled_ds = np.concatenate((scaled_ds, np.array(labels)[:,None]),axis=1)
-        scaled_features, scaled_labels = dataset.split_features_and_labels(scaled_ds)
-        return scaled_features, scaled_labels
-=======
         labels = array[:, -1]
         scaled_ds = scale(array[:, :-1])
         scaled_ds = np.concatenate((scaled_ds, np.array(labels)[:, None]), axis=1)
         scaled_train_features, scaled_train_labels = dataset.split_features_and_labels(scaled_ds)
         return scaled_train_features, scaled_train_labels
->>>>>>> c14113c... ugly bug fixes, working
 
     def _tune(self) -> Dict:
         """Performs hyperparameter tuning for KNN model and returns best hyperparams.
