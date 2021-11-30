@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import keras
 import keras_tuner as kt
@@ -85,6 +85,17 @@ class NeuralNet(ModelTrainable):
 
         # return fit model
         return model
+
+    def test(self) -> Tuple[float, float]:
+        """Evaluates model on test dataset.
+
+        Returns
+        -------
+        Tuple[float, float]
+            tuple of model loss and accuracy
+        """
+        ...
+        return self._trained_model.evaluate(*dataset.split_features_and_labels(self._test_ds))
 
     def _model_builder(self, hp: kt.HyperParameters) -> keras.Model:
         """Builds hyperparameter tunable NN model.

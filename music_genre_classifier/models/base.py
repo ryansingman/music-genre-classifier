@@ -46,6 +46,7 @@ class ModelTrainable(abc.ABC):
 
         self._trained_model = self._train(hyperparams)
 
+    @abc.abstractmethod
     def test(self) -> Tuple[float, float]:
         """Evaluates model on test dataset.
 
@@ -54,7 +55,7 @@ class ModelTrainable(abc.ABC):
         Tuple[float, float]
             tuple of model loss and accuracy
         """
-        return self._trained_model.evaluate(*dataset.split_features_and_labels(self._test_ds))
+        ...
 
     @staticmethod
     def _train_val_split(
