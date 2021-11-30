@@ -1,6 +1,9 @@
 from typing import Dict
 
 import numpy as np
+import keras
+import keras_tuner as kt
+import pandas as pd
 from sklearn.preprocessing import scale
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
@@ -22,7 +25,8 @@ class KNN(ModelTrainable):
             dataset to test model with
         """
         super().__init__(train_ds, test_ds)
-    def normalized_dataset(array: np.array):
+
+    def normalized_dataset(self, array: np.array):
         """Normalizes dataset in order to maximize knn accuracy.
 
         Returns
@@ -45,7 +49,7 @@ class KNN(ModelTrainable):
             best hyperparameters found in search
         """
         #Normalize train dataset to fit knn
-        scaled_train_features, scaled_train_labels = normalized_dataset(self._train_ds)
+        scaled_train_features, scaled_train_labels = self.normalized_dataset(self._train_ds)
         
         # perform hyperparameter search and get best hyperparameters
         hyperparameters = { 'n_neighbors' : list(range(1,20)),
@@ -53,8 +57,8 @@ class KNN(ModelTrainable):
                        'metric' : ['euclidean','minkowski','manhattan']}
         grid_search = GridSearchCV(KNeighborsClassifier(), hyperparameters, verbose = 1, cv=3, n_jobs = -1)
         fit = grid_search.fit(scaled_train_features, scaled_train_labels)
-        final_hyperparameters = fit.best_params_
-        return final_hyperparameters
+
+        return fit.best_params_
 
     def _train(self, hyperparams: Dict):
         """Trains KNN model on hyperparameters and returns trained model.
@@ -70,7 +74,7 @@ class KNN(ModelTrainable):
             trained sklearn model
         """
         #Normalize train dataset to fit knn
-        scaled_train_features, scaled_train_labels = normalized_dataset(self._train_ds)
+        scaled_train_features, scaled_train_labels = self.normalized_dataset(self._train_ds)
         
         #Build knn model with hyperparameters
         knn = KNeighborsClassifier(weights= hyperparams['weights'], 
@@ -82,13 +86,8 @@ class KNN(ModelTrainable):
         return trained_model
         
 
-    def _test(self, hyperparams: Dict):
+    def test(self):
         """Test function to see accuracy of knn.
-
-        Parameters
-        ----------
-        hp : kt.HyperParameters
-            hyperparameter space container
 
         Returns
         -------
@@ -96,9 +95,11 @@ class KNN(ModelTrainable):
             An Accuracy score for knn
         """
         #Normalize test dataset to fit knn
-        scaled_test_features, scaled_test_labels = normalized_dataset(self._test_ds)
+        scaled_test_features, scaled_test_labels = self.normalized_dataset(self._test_ds)
         
         #Testing model and determining accuracy
-        prediction = _self.train(self._tune).predict(scaled_test_features)
-        accuracy = metrics.accuracy_score(scaled_test_labels, prediction)
-        return accuracy
+        prediction = self._train(self._best_hyperparams).predict(scaled_test_features)
+        return None, metrics.accuracy_score(scaled_test_labels, prediction)
+
+    def _model_builder(self, hp: kt.HyperParameters) -> keras.Model:
+        pass
