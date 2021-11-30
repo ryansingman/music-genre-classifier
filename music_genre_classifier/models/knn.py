@@ -33,8 +33,8 @@ class KNN(ModelTrainable):
         labels = array[:,-1]
         scaled_ds = scale(array[:,:-1])
         scaled_ds = np.concatenate((scaled_ds, np.array(labels)[:,None]),axis=1)
-        scaled_train_features, scaled_train_labels = dataset.split_features_and_labels(scaled_ds)
-        return scaled_train_features, scaled_train_labels
+        scaled_features, scaled_labels = dataset.split_features_and_labels(scaled_ds)
+        return scaled_features, scaled_labels
 
     def _tune(self) -> Dict:
         """Performs hyperparameter tuning for KNN model and returns best hyperparams.
